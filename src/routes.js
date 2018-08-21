@@ -3,6 +3,8 @@ import CateListPage from 'pages/categoryManagement/CateListPage/CateListPage'
 import ProductListPage from './pages/productManagement/ProductListPage/ProductListPage';
 import ProductActionPage from './pages/productManagement/ProductActionPage/ProductActionPage';
 import CateActionPage from 'pages/categoryManagement/CateActionPage/CateActionPage';
+import CustomerActionPage from './pages/customerManagement/CustomerActionPage/CustomerActionPage';
+import CustomerListPage from './pages/customerManagement/CustomerListPage/CustomerListPage';
 
 const routes = [
     // {
@@ -24,6 +26,21 @@ const routes = [
         path: '/cate/:id/:pagination/edit',
         exact: false,
         main: ({ match, history }) => <CateActionPage match={match} history={history} />
+    },
+    {
+        path: '/customer-list',
+        exact: false,
+        main: () => <CustomerListPage />
+    },
+    {
+        path: '/customer/add',
+        exact: false, 
+        main: ({ location, history }) => <CustomerActionPage location={location} history={history} />
+    },
+    {
+        path: '/customer/:id/:pagination/edit',
+        exact: false,
+        main: ({ match, history }) => <CustomerActionPage match={match} history={history} />
     },
     {
         path: '/product-list',
