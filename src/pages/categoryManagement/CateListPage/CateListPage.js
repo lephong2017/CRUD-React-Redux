@@ -1,19 +1,16 @@
 import React, { Component } from 'react';
-import './ProductListPage.css';
+import './CateListPage.css';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import ReactTable from 'react-table';
 import matchSorter from 'match-sorter';
 import 'react-table/react-table.css';
-
 import swal from 'sweetalert';
 import MyButton from 'components/button/Button';
-import MyDropdownList from 'components/dropdown/MyDropdownBT.js';
-import { actFetchProductsRequest, actDeleteProductRequest, searchProductRequest ,getTotalProduct } 
-        from 'redux/productManagement/actions/index';
-import {actFetchCategoryProductRequest} from 'redux/productManagement/actions/cates';
+
+import {actFetchCategoryRequest, actDeleteCategoryRequest, searchCategoryRequest} from 'redux/categoryManagement/actions/index';
 import {FormGroup,FormControl,Form,Button} from 'react-bootstrap';
-class ProductListPage extends Component {  
+class CateListPage extends Component {  
     constructor(props){
         super(props);
         this.state={
@@ -26,23 +23,20 @@ class ProductListPage extends Component {
     }
     componentDidMount(){
         var {pageSize,pageIndex,iSearch} = this.state;
-        this.props.fetchAllProducts(pageSize,pageIndex,iSearch);
-        this.props.fetchAllCategoryProduct();
+        this.props.fetchAllCategory(pageSize,pageIndex,iSearch);
     }
     componentWillMount(){
         // Gọi trước khi component đc render lần đầu tiên 
         var {pageSize,pageIndex,iSearch} = this.state;
-        this.props.fetchAllProducts(pageSize,pageIndex,iSearch);
-        this.props.fetchAllCategoryProduct();
+        this.props.fetchAllCategory(pageSize,pageIndex,iSearch);
     }
     onChange=e =>{
         if(e.target.value===''){
             this.setState({iSearch:"ALL"});
-            this.props.fetchAllProducts(this.state.pageSize,this.state.pageIndex,"ALL");
-            this.props.fetchAllCategoryProduct();
+            this.props.fetchAllCategory(this.state.pageSize,this.state.pageIndex,"ALL");
         }else{
             this.setState({iSearch:e.target.value},function(){
-             this.props.searchProduct(this.state.pageSize,this.state.pageIndex,this.state.iSearch);
+             this.props.searchCategory(this.state.pageSize,this.state.pageIndex,this.state.iSearch);
             });
         }
         this.setState({
@@ -56,11 +50,10 @@ class ProductListPage extends Component {
         var word = this.state.iSearch;
         if(word!==''){
             if(word==='ALL'){
-                this.props.fetchAllProducts(this.state.pageSize,this.state.pageIndex,"ALL");
-                this.props.fetchAllCategoryProduct();
+                this.props.fetchAllCategory(this.state.pageSize,this.state.pageIndex,"ALL");
             }else{
                 console.log(word+" is word search, pageSize: "+this.state.pageSize+" pageInd: "+this.state.pageIndex);
-                this.props.searchProduct(this.state.pageSize,this.state.pageIndex,word);
+                this.props.searchCategory(this.state.pageSize,this.state.pageIndex,word);
             }
         }else{
             console.log("Lỗi này hơi bị ghê!!!");
@@ -72,12 +65,7 @@ class ProductListPage extends Component {
        
     }
     onDelete = (id) => { 
-        var {onDeleteProduct,saveCateCode} = this.props;
-        var StringFilter=this.state.iSearch;
-        if(saveCateCode==='all-cate'){
-          StringFilter='ALL';
-        }
-        if(saveCateCode!=='null') StringFilter=saveCateCode;
+        var {onDeleteCategory} = this.props;
         swal({
             title: "Are you sure?",
             text: "Once deleted, you will not be able to recover this imaginary file!",
@@ -87,8 +75,7 @@ class ProductListPage extends Component {
         })
         .then((willDelete) => {
             if (willDelete) {
-                onDeleteProduct(id,this.state.pageSize,this.state.pageIndex,StringFilter);
-                
+                onDeleteCategory(id,this.state.pageSize,this.state.pageIndex,this.state.iSearch);
                 swal("Poof! Your imaginary file has been deleted!", {
                     icon: "success",
                 });
@@ -97,8 +84,10 @@ class ProductListPage extends Component {
             }
         });
     }
+    
+
     render() {
-        var { isFetching,products,categorys,fetchAllProducts,searchProduct,saveCateCode } = this.props;
+        var { isFetchingCategory,categorys,fetchAllCategory,searchCategory } = this.props;
         return (
             <div className="container-content">
                 <div className="row">
@@ -106,7 +95,7 @@ class ProductListPage extends Component {
                         <div className="container-table">
                             <div className="row-button">
                                 <div className="button-left">
-                                    <Link to="/product/add" className="btn btn-primary mb-5">
+                                    <Link to="/cate/add" className="btn btn-primary mb-5">
                                         <i className="glyphicon glyphicon-plus"></i> Thêm Sản Phẩm
                                     </Link>
                                 </div>
@@ -118,124 +107,69 @@ class ProductListPage extends Component {
                                         <Button type="submit">Search</Button>
                                     </Form>
                                 </div>
-                                <div className="button-right">
-                                    <div className="backGround-dropdown" 
-                                            onClick={()=>{
-                                                this.setState({isActiveDropdown:true})
-                                            }}>
-                                        <MyDropdownList
-                                         pagination={[ 
-                                             this.state.pageIndex,
-                                             this.state.pageSize,
-                                            ]} 
-                                         cateButton="Primary" 
-                                         title="Category" id="1" 
-                                         listCate={categorys}/>
-                                    </div>
-                                </div>
+                                
                             </div>
                             <br/>
                             <br/>
                             <br/>
-                            <br/>
                            <div style={{width:'100%',marginTop:'30px',}}>
-                           <ReactTable data={products}
-                                        loading={isFetching}
+                           <ReactTable data={categorys}
+                                        loading={isFetchingCategory}
                                         defaultFilterMethod={(filter, row) => String(row[filter.id]) === filter.value}
                                         columns={[
                                         {
                                             Header: "ID",
-                                            id: "productId",
-                                            accessor: d => d.productId,
-                                            filterMethod: (filter, rows) =>
-                                            matchSorter(rows, filter.value, { keys: ["productId"] }),
-                                            filterAll: true
-                                        },
-                                        {
-                                            Header: "Name",
-                                            id: "productName",
-                                            accessor: d => d.productName,
-                                            filterMethod: (filter, rows) =>
-                                            matchSorter(rows, filter.value, { keys: ["productName"] }),
-                                            filterAll: true
-                                        },
-                                        {
-                                            Header: "Category",
                                             id: "productCategoryCode",
                                             accessor: d => d.productCategoryCode,
                                             filterMethod: (filter, rows) =>
                                             matchSorter(rows, filter.value, { keys: ["productCategoryCode"] }),
-                                            Cell: row=>{
-
-                                                var result ="";
-                                                categorys.forEach((cate, index) => {
-                                                    if (cate.productCategoryCode === row.value) {
-                                                        result = cate.productCategoryDescription;
-                                                    }
-                                                });
-                                                return result;
-                                            }
-                                            ,
-                                            
                                             filterAll: true
                                         },
                                         {
-                                            Header: "Detail",
-                                            id: "otherProductDetails",
-                                            accessor: d => d.otherProductDetails,
+                                            Header: "Description",
+                                            id: "productCategoryDescription",
+                                            accessor: d => d.productCategoryDescription,
                                             filterMethod: (filter, rows) =>
-                                            matchSorter(rows, filter.value, { keys: ["otherProductDetails"] }),
+                                            matchSorter(rows, filter.value, { keys: ["productCategoryDescription"] }),
                                             filterAll: true
                                         },
+                                        
                                         {
-                                            
                                             Header: "Edit",
-                                            accessor:"productId",
+                                            accessor:"productCategoryCode",
                                             filterable:false,
                                             Cell: row => (
                                             <div className="button-table"> 
                                                 <MyButton small aria_label='EDIT' 
-                                                    ID={row.value} 
-                                                    obj="product"
+                                                    ID={row.value}
+                                                    obj="cate"
                                                     pagination={[
                                                         this.state.pageIndex,
                                                         this.state.pageSize,
                                                         this.state.iSearch
-                                                    ]}/>
+                                                ]}/>
                                             </div>
                                             )
                                         },
                                         {   
                                             Header: "Delete",
-                                            accessor:"productId",
+                                            accessor:"productCategoryCode",
                                             filterable:false,
                                             Cell: row => (
                                             <div className="button-table"> 
-                                                <MyButton size="small" 
-                                                    aria_label='DELETE' 
-                                                    onClickComponent={()=>this.onDeleteProduct(row.value)}
-                                                    productId={row.value} 
-                                                    pagination={[this.state.pageIndex,this.state.pageSize,this.state.iSearch]}/> 
+                                                <MyButton  size="small"  aria_label='DELETE' 
+                                                    onClickComponent={()=>this.onDelete(row.value)}/> 
                                             </div>
                                             )
                                         }]}
                                         defaultPageSize={5}
                                         onPageChange={(pageInd) => {
-                                            var stringFilter=(saveCateCode!=='null')?saveCateCode:this.state.iSearch;
-                                            if(saveCateCode==='all-cate'){
-                                                this.setState({
-                                                    listPageVisit:[],
-                                                    listPageVisitFilter:[],
-                                                    iSearch:'ALL'
-                                                });
-                                            }
-                                            if(saveCateCode==='null'||saveCateCode==='all-cate'){
-                                                if(stringFilter===''||stringFilter===0||stringFilter==="ALL"){
+                                            var stringFilter = this.state.iSearch;
+                                                if(stringFilter===''||stringFilter==="ALL"){
                                                     var pageVisit = this.state.listPageVisit;
                                                     this.setState({
                                                     pageIndex:pageInd+1,
                                                     listPageVisitFilter:[],
-                                                    isActiveDropdown:false,
                                                 },
                                                     function(){
                                                         // console.log(this.state.listPageVisit);
@@ -243,7 +177,7 @@ class ProductListPage extends Component {
                                                         if(isPageVisit===false){
                                                             pageVisit.push(pageInd+1);
                                                             this.setState({listPageVisit:pageVisit, });
-                                                            fetchAllProducts(
+                                                            fetchAllCategory(
                                                                 this.state.pageSize,
                                                                 this.state.pageIndex,
                                                                 "ALL"
@@ -259,7 +193,7 @@ class ProductListPage extends Component {
                                                             if(isPageVisit===false){
                                                                 pageVisit.push(pageInd+1);
                                                                 this.setState({listPageVisitFilter:pageVisit, });
-                                                                searchProduct(
+                                                                searchCategory(
                                                                     this.state.pageSize,
                                                                     this.state.pageIndex,
                                                                     stringFilter
@@ -268,29 +202,10 @@ class ProductListPage extends Component {
         
                                                         });
                                                     }
-                                            }else{
-                                                this.setState({
-                                                    listPageVisit:[],
-                                                    listPageVisitFilter:[],
-                                                    pageIndex:pageInd+1,
-                                                },()=>{
-                                                    var pageVisit = this.state.listPageVisitFilter;
-                                                    var isPageVisit= this.state.listPageVisitFilter.includes(pageInd+1);
-                                                    if(isPageVisit===false){
-                                                        pageVisit.push(pageInd+1);
-                                                        this.setState({listPageVisitFilter:pageVisit, });
-                                                        searchProduct(
-                                                            this.state.pageSize,
-                                                            this.state.pageIndex,
-                                                            stringFilter
-                                                        );
-                                                    }
-                                                });
 
                                             }
-                                        } 
                                         } // Called when the page index is changed by the user
-                                        onPageSizeChange={(pSize, pIndex) => {  
+                                        onPageSizeChange={(pSize, pIndex) => {
                                             this.setState({
                                                 pageIndex:pIndex+1,
                                                 pageSize:pSize,
@@ -301,13 +216,13 @@ class ProductListPage extends Component {
                                                     if(this.state.iSearch===0||
                                                         this.state.iSearch===''||
                                                         this.state.iSearch==="ALL"){
-                                                            fetchAllProducts(
+                                                            fetchAllCategory(
                                                                 this.state.pageSize,
                                                                 this.state.pageIndex,
                                                                 "ALL"
                                                             );
                                                         }else{
-                                                            searchProduct(
+                                                            searchCategory(
                                                                 this.state.pageSize,
                                                                 this.state.pageIndex,
                                                                 this.state.iSearch
@@ -328,35 +243,27 @@ class ProductListPage extends Component {
 
 }
 const mapStateToProps = state => {
+
     return {
-        saveCateCode:state.saveCateCode,
-        totalData:state.totalData,
-        products: state.products,
-        categorys: state.categorys,
-        isFetching:state.isFetching
+        categorys: state.categorys_index,
+        isFetchingCategory:state.isFetchingCategory
     }
 }
 
 const mapDispatchToProps = (dispatch, props) => {
     return {
-        fetchAllProducts: (pageSize,pageIndex,StringFilter) => {
-            dispatch(actFetchProductsRequest(pageSize,pageIndex,StringFilter));
+        fetchAllCategory: (pageSize,pageIndex,StringFilter) => {
+            dispatch(actFetchCategoryRequest(pageSize,pageIndex,StringFilter));
         },
-        fetchAllCategoryProduct:()=>{
-            dispatch(actFetchCategoryProductRequest());
+        searchCategory: (pageSize,pageNow,keywork) => {
+            dispatch(searchCategoryRequest(pageSize,pageNow,keywork))
         },
-        onDeleteProduct: (productId,pageSize,pageIndex,StringFilter) => {
-            dispatch(actDeleteProductRequest(productId,pageSize,pageIndex,StringFilter));
-        },
-        searchProduct: (pageSize,pageNow,keywork) => {
-            dispatch(searchProductRequest(pageSize,pageNow,keywork))
-        },
-        getTotalData: (stringFilter,condition) => {
-            dispatch(getTotalProduct(stringFilter,condition))
+        onDeleteCategory: (id,pageSize,pageIndex,StringFilter) => {
+            dispatch(actDeleteCategoryRequest(id,pageSize,pageIndex,StringFilter));
         },
         
 
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProductListPage);
+export default connect(mapStateToProps, mapDispatchToProps)(CateListPage);

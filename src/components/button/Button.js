@@ -4,7 +4,6 @@ import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
-import swal from 'sweetalert';
 import { Link } from 'react-router-dom';
 
 import { connect } from 'react-redux';
@@ -18,51 +17,25 @@ class MyButton extends Component{
       propsDemo:PropTypes.object.isRequired,
     }
   }
-  onDelete = (id) => { 
-    var {onDeleteProduct,productId,pagination,saveCateCode} = this.props;
-    var pageSize=pagination[1];
-    var pageIndex=pagination[0];
-    var StringFilter=pagination[2];
-    if(saveCateCode==='all-cate'){
-      StringFilter='ALL';
-    }
-    if(saveCateCode!=='null') StringFilter=saveCateCode;
-    swal({
-        title: "Are you sure?",
-        text: "Once deleted, you will not be able to recover this imaginary file!",
-        icon: "warning",
-        buttons: true,
-        dangerMode: true,
-    })
-    .then((willDelete) => {
-        if (willDelete) {
-            onDeleteProduct(productId,pageSize,pageIndex,StringFilter);
-            
-            swal("Poof! Your imaginary file has been deleted!", {
-                icon: "success",
-            });
-        } else {
-            swal("Your imaginary file is safe!");
-        }
-    });
-}
+
+
   render(){
-    var { productId} = this.props;
+    var { ID,obj,pagination} = this.props;
     if(this.props.aria_label==='ADD') {
       return (
         <div>
-          <Button size="small" variant="fab" color="primary" aria-label={this.props.aria_label} className={this.state.propsDemo.button}>
+          <Button onClick={()=>this.props.onClick} size="small" variant="fab" color="primary" aria-label={this.props.aria_label} className={this.state.propsDemo.button}>
               <AddIcon />
           </Button>
         </div>
       );
     }
     if(this.props.aria_label==='EDIT'){
-      if(productId!==undefined){
+      if(ID!==undefined){
         return (
           <div>
-            <Link to={`/product/${productId}/${this.props.pagination}/edit`} >
-              <Button size="small"  variant="fab" color="primary" aria-label={this.props.aria_label} className={this.state.propsDemo.button}>
+            <Link to={`/${obj}/${ID}/${pagination}/edit`} >
+              <Button  size="small"  variant="fab" color="primary" aria-label={this.props.aria_label} className={this.state.propsDemo.button}>
                 <EditIcon>edit_icon</EditIcon>
               </Button>
             </Link> 
@@ -70,7 +43,7 @@ class MyButton extends Component{
         );
       }else return (
       <div>
-        <Button size="small" variant="fab" color="primary" aria-label={this.props.aria_label} className={this.state.propsDemo.button}>
+        <Button onClick={this.props.onClick} size="small" variant="fab" color="primary" aria-label={this.props.aria_label} className={this.state.propsDemo.button}>
           <EditIcon>edit_icon</EditIcon>
         </Button>
       </div>);
@@ -78,7 +51,8 @@ class MyButton extends Component{
     if(this.props.aria_label==='DELETE'){
       return (
         <div>
-          <Button  size="small" onClick={this.onDelete} variant="fab" color="primary" aria-label={this.props.aria_label} className={this.state.propsDemo.button}>
+          <Button onClick={this.props.onClickComponent}  
+              size="small" variant="fab" color="primary" aria-label={this.props.aria_label} className={this.state.propsDemo.button}>
              <DeleteIcon/>
           </Button>
         </div>

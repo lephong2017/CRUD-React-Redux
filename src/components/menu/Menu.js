@@ -11,7 +11,17 @@ const menus = [
         name : 'Quản Lý Sản Phẩm',
         to : '/product-list',
         exact : false
-    }
+    },
+    {
+        name : 'Quản Lý Loại Sản Phẩm',
+        to : '/cate-list',
+        exact : false
+    },
+    {
+        name : 'Quản Lý Khách Hàng',
+        to : '/customer-list',
+        exact : false
+    },
 ]
 
 const MenuLink = ({ label, to, activeOnlyWhenExact }) => {

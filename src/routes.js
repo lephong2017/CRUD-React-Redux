@@ -1,6 +1,8 @@
 import React from 'react';
+import CateListPage from 'pages/categoryManagement/CateListPage/CateListPage'
 import ProductListPage from './pages/productManagement/ProductListPage/ProductListPage';
 import ProductActionPage from './pages/productManagement/ProductActionPage/ProductActionPage';
+import CateActionPage from 'pages/categoryManagement/CateActionPage/CateActionPage';
 
 const routes = [
     // {
@@ -8,6 +10,21 @@ const routes = [
     //     exact: true,
     //     main: () => <HomePage />
     // },
+    {
+        path: '/cate-list',
+        exact: false,
+        main: () => <CateListPage />
+    },
+    {
+        path: '/cate/add',
+        exact: false, 
+        main: ({ location, history }) => <CateActionPage location={location} history={history} />
+    },
+    {
+        path: '/cate/:id/:pagination/edit',
+        exact: false,
+        main: ({ match, history }) => <CateActionPage match={match} history={history} />
+    },
     {
         path: '/product-list',
         exact: false,
