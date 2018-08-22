@@ -8,12 +8,12 @@ import 'react-table/react-table.css';
 
 import swal from 'sweetalert';
 import MyButton from 'components/button/Button';
-import MyDropdownList from 'components/dropdown/MyDropdownBT.js';
-import { actFetchProductsRequest, actDeleteProductRequest, searchProductRequest ,getTotalProduct } 
-        from 'redux/productManagement/actions/index';
-import {actFetchCategoryProductRequest} from 'redux/productManagement/actions/cates';
+import MyDropdownList from 'components/dropdown/DropdownOrder';
+import { actFetchCustomerOrdersRequest, actDeleteCustomerOrdersRequest, searchCustomerOrdersRequest  } 
+        from 'redux/customerOrdersManagement/actions/index';
+import {actFetchListCustomerOrdersRequest} from 'redux/customerOrdersManagement/actions/cates';
 import {FormGroup,FormControl,Form,Button} from 'react-bootstrap';
-class ProductListPage extends Component {  
+class CustomerOrdersListPage extends Component {  
     constructor(props){
         super(props);
         this.state={
@@ -26,23 +26,24 @@ class ProductListPage extends Component {
     }
     componentDidMount(){
         var {pageSize,pageIndex,iSearch} = this.state;
-        this.props.fetchAllProducts(pageSize,pageIndex,iSearch);
-        this.props.fetchAllCategoryProduct();
+        this.props.fetchAllCustomerOrders(pageSize,pageIndex,iSearch);
+        this.props.fetchAllListCustomerOrders();
     }
     componentWillMount(){
         // Gọi trước khi component đc render lần đầu tiên 
         var {pageSize,pageIndex,iSearch} = this.state;
-        this.props.fetchAllProducts(pageSize,pageIndex,iSearch);
-        this.props.fetchAllCategoryProduct();
+        this.props.fetchAllCustomerOrders(pageSize,pageIndex,iSearch);
+        this.props.fetchAllListCustomerOrders();
     }
     onChange=e =>{
-        if(e.target.value===''){
+        var val =e.target.value;
+        if(val.trim()===''){
             this.setState({iSearch:"ALL"});
-            this.props.fetchAllProducts(this.state.pageSize,this.state.pageIndex,"ALL");
-            this.props.fetchAllCategoryProduct();
+            this.props.fetchAllCustomerOrders(this.state.pageSize,this.state.pageIndex,"ALL");
+            this.props.fetchAllListCustomerOrders();
         }else{
             this.setState({iSearch:e.target.value},function(){
-             this.props.searchProduct(this.state.pageSize,this.state.pageIndex,this.state.iSearch);
+             this.props.searchCustomerOrders(this.state.pageSize,this.state.pageIndex,this.state.iSearch);
             });
         }
         this.setState({
@@ -56,11 +57,11 @@ class ProductListPage extends Component {
         var word = this.state.iSearch;
         if(word!==''){
             if(word==='ALL'){
-                this.props.fetchAllProducts(this.state.pageSize,this.state.pageIndex,"ALL");
-                this.props.fetchAllCategoryProduct();
+                this.props.fetchAllCustomerOrders(this.state.pageSize,this.state.pageIndex,"ALL");
+                this.props.fetchAllListCustomerOrders();
             }else{
                 console.log(word+" is word search, pageSize: "+this.state.pageSize+" pageInd: "+this.state.pageIndex);
-                this.props.searchProduct(this.state.pageSize,this.state.pageIndex,word);
+                this.props.searchCustomerOrders(this.state.pageSize,this.state.pageIndex,word);
             }
         }else{
             console.log("Lỗi này hơi bị ghê!!!");
@@ -71,13 +72,13 @@ class ProductListPage extends Component {
         });
        
     }
-    onDelete = (id) => { 
-        var {onDeleteProduct,saveCateCode} = this.props;
+    onDeleteCustomerOrders = (id) => { 
+        var {onDeleteCustomerOrders,saveCustomerID} = this.props;
         var StringFilter=this.state.iSearch;
-        if(saveCateCode==='all-cate'){
+        if(saveCustomerID==='all-cate'){
           StringFilter='ALL';
         }
-        if(saveCateCode!=='null') StringFilter=saveCateCode;
+        if(saveCustomerID!=='null') StringFilter=saveCustomerID;
         swal({
             title: "Are you sure?",
             text: "Once deleted, you will not be able to recover this imaginary file!",
@@ -87,7 +88,7 @@ class ProductListPage extends Component {
         })
         .then((willDelete) => {
             if (willDelete) {
-                onDeleteProduct(id,this.state.pageSize,this.state.pageIndex,StringFilter);
+                onDeleteCustomerOrders(id,this.state.pageSize,this.state.pageIndex,StringFilter);
                 
                 swal("Poof! Your imaginary file has been deleted!", {
                     icon: "success",
@@ -98,7 +99,7 @@ class ProductListPage extends Component {
         });
     }
     render() {
-        var { isFetching,products,categorys,fetchAllProducts,searchProduct,saveCateCode } = this.props;
+        var { isFetching,orders,listCustomer,fetchAllCustomerOrders,searchCustomerOrders,saveCustomerID } = this.props;
         return (
             <div className="container-content">
                 <div className="row">
@@ -106,8 +107,8 @@ class ProductListPage extends Component {
                         <div className="container-table">
                             <div className="row-button">
                                 <div className="button-left">
-                                    <Link to="/product/add" className="btn btn-primary mb-5">
-                                        <i className="glyphicon glyphicon-plus"></i> Thêm Sản Phẩm
+                                    <Link to="/orders/add" className="btn btn-primary mb-5">
+                                        <i className="glyphicon glyphicon-plus"></i> Thêm Đơn Hàng
                                     </Link>
                                 </div>
                                 <div className="button-right" >
@@ -119,10 +120,7 @@ class ProductListPage extends Component {
                                     </Form>
                                 </div>
                                 <div className="button-right">
-                                    <div className="backGround-dropdown" 
-                                            onClick={()=>{
-                                                this.setState({isActiveDropdown:true})
-                                            }}>
+                                    <div className="backGround-dropdown"  >
                                         <MyDropdownList
                                          pagination={[ 
                                              this.state.pageIndex,
@@ -130,7 +128,7 @@ class ProductListPage extends Component {
                                             ]} 
                                          cateButton="Primary" 
                                          title="Category" id="1" 
-                                         listCate={categorys}/>
+                                         listCustomer={listCustomer}/>
                                     </div>
                                 </div>
                             </div>
@@ -139,38 +137,38 @@ class ProductListPage extends Component {
                             <br/>
                             <br/>
                            <div style={{width:'100%',marginTop:'30px',}}>
-                           <ReactTable data={products}
+                           <ReactTable data={orders}
                                         loading={isFetching}
                                         defaultFilterMethod={(filter, row) => String(row[filter.id]) === filter.value}
                                         columns={[
                                         {
                                             Header: "ID",
-                                            id: "productId",
-                                            accessor: d => d.productId,
+                                            id: "shippingMethodCode",
+                                            accessor: d => d.shippingMethodCode,
                                             filterMethod: (filter, rows) =>
-                                            matchSorter(rows, filter.value, { keys: ["productId"] }),
+                                            matchSorter(rows, filter.value, { keys: ["shippingMethodCode"] }),
                                             filterAll: true
                                         },
                                         {
-                                            Header: "Name",
-                                            id: "productName",
-                                            accessor: d => d.productName,
+                                            Header: "Status",
+                                            id: "orderStatusCode",
+                                            accessor: d => d.orderStatusCode,
                                             filterMethod: (filter, rows) =>
-                                            matchSorter(rows, filter.value, { keys: ["productName"] }),
+                                            matchSorter(rows, filter.value, { keys: ["orderStatusCode"] }),
                                             filterAll: true
                                         },
                                         {
-                                            Header: "Category",
-                                            id: "productCategoryCode",
-                                            accessor: d => d.productCategoryCode,
+                                            Header: "Customer Name",
+                                            id: "customerId",
+                                            accessor: d => d.customerId,
                                             filterMethod: (filter, rows) =>
-                                            matchSorter(rows, filter.value, { keys: ["productCategoryCode"] }),
+                                            matchSorter(rows, filter.value, { keys: ["customerId"] }),
                                             Cell: row=>{
 
                                                 var result ="";
-                                                categorys.forEach((cate, index) => {
-                                                    if (cate.productCategoryCode === row.value) {
-                                                        result = cate.productCategoryDescription;
+                                                listCustomer.forEach((cate, index) => {
+                                                    if (cate.customerId === row.value) {
+                                                        result = cate.customerName;
                                                     }
                                                 });
                                                 return result;
@@ -181,22 +179,22 @@ class ProductListPage extends Component {
                                         },
                                         {
                                             Header: "Detail",
-                                            id: "otherProductDetails",
-                                            accessor: d => d.otherProductDetails,
+                                            id: "otherOrtherDetails",
+                                            accessor: d => d.otherOrtherDetails,
                                             filterMethod: (filter, rows) =>
-                                            matchSorter(rows, filter.value, { keys: ["otherProductDetails"] }),
+                                            matchSorter(rows, filter.value, { keys: ["otherOrtherDetails"] }),
                                             filterAll: true
                                         },
                                         {
                                             
                                             Header: "Edit",
-                                            accessor:"productId",
+                                            accessor:"orderId",
                                             filterable:false,
                                             Cell: row => (
                                             <div className="button-table"> 
                                                 <MyButton small aria_label='EDIT' 
                                                     ID={row.value} 
-                                                    obj="product"
+                                                    obj="orders"
                                                     pagination={[
                                                         this.state.pageIndex,
                                                         this.state.pageSize,
@@ -207,29 +205,30 @@ class ProductListPage extends Component {
                                         },
                                         {   
                                             Header: "Delete",
-                                            accessor:"productId",
+                                            accessor:"orderId",
                                             filterable:false,
                                             Cell: row => (
                                             <div className="button-table"> 
                                                 <MyButton size="small" 
                                                     aria_label='DELETE' 
-                                                    onClickComponent={()=>this.onDeleteProduct(row.value)}
+                                                    onClickComponent={()=>this.onDeleteCustomerOrders(row.value)}
                                                     productId={row.value} 
                                                     pagination={[this.state.pageIndex,this.state.pageSize,this.state.iSearch]}/> 
                                             </div>
+
                                             )
                                         }]}
                                         defaultPageSize={5}
                                         onPageChange={(pageInd) => {
-                                            var stringFilter=(saveCateCode!=='null')?saveCateCode:this.state.iSearch;
-                                            if(saveCateCode==='all-cate'){
+                                            var stringFilter=(saveCustomerID!=='null')?saveCustomerID:this.state.iSearch;
+                                            if(saveCustomerID==='all-cate'){
                                                 this.setState({
                                                     listPageVisit:[],
                                                     listPageVisitFilter:[],
                                                     iSearch:'ALL'
                                                 });
                                             }
-                                            if(saveCateCode==='null'||saveCateCode==='all-cate'){
+                                            if(saveCustomerID==='null'||saveCustomerID==='all-cate'){
                                                 if(stringFilter===''||stringFilter===0||stringFilter==="ALL"){
                                                     var pageVisit = this.state.listPageVisit;
                                                     this.setState({
@@ -243,7 +242,7 @@ class ProductListPage extends Component {
                                                         if(isPageVisit===false){
                                                             pageVisit.push(pageInd+1);
                                                             this.setState({listPageVisit:pageVisit, });
-                                                            fetchAllProducts(
+                                                            fetchAllCustomerOrders(
                                                                 this.state.pageSize,
                                                                 this.state.pageIndex,
                                                                 "ALL"
@@ -259,7 +258,7 @@ class ProductListPage extends Component {
                                                             if(isPageVisit===false){
                                                                 pageVisit.push(pageInd+1);
                                                                 this.setState({listPageVisitFilter:pageVisit, });
-                                                                searchProduct(
+                                                                searchCustomerOrders(
                                                                     this.state.pageSize,
                                                                     this.state.pageIndex,
                                                                     stringFilter
@@ -279,7 +278,7 @@ class ProductListPage extends Component {
                                                     if(isPageVisit===false){
                                                         pageVisit.push(pageInd+1);
                                                         this.setState({listPageVisitFilter:pageVisit, });
-                                                        searchProduct(
+                                                        searchCustomerOrders(
                                                             this.state.pageSize,
                                                             this.state.pageIndex,
                                                             stringFilter
@@ -301,13 +300,13 @@ class ProductListPage extends Component {
                                                     if(this.state.iSearch===0||
                                                         this.state.iSearch===''||
                                                         this.state.iSearch==="ALL"){
-                                                            fetchAllProducts(
+                                                            fetchAllCustomerOrders(
                                                                 this.state.pageSize,
                                                                 this.state.pageIndex,
                                                                 "ALL"
                                                             );
                                                         }else{
-                                                            searchProduct(
+                                                            searchCustomerOrders(
                                                                 this.state.pageSize,
                                                                 this.state.pageIndex,
                                                                 this.state.iSearch
@@ -329,34 +328,30 @@ class ProductListPage extends Component {
 }
 const mapStateToProps = state => {
     return {
-        saveCateCode:state.saveCateCode,
-        totalData:state.totalData,
-        products: state.products,
-        categorys: state.categorys,
-        isFetching:state.isFetching
-    }
+        listCustomer:state.listCustomer,
+        saveCustomerID:state.saveCustomerID,
+        orders: state.order,
+        isFetching:state.isFetchingOrder
+    }   
 }
 
 const mapDispatchToProps = (dispatch, props) => {
     return {
-        fetchAllProducts: (pageSize,pageIndex,StringFilter) => {
-            dispatch(actFetchProductsRequest(pageSize,pageIndex,StringFilter));
+        fetchAllCustomerOrders: (pageSize,pageIndex,StringFilter) => {
+            dispatch(actFetchCustomerOrdersRequest(pageSize,pageIndex,StringFilter));
         },
-        fetchAllCategoryProduct:()=>{
-            dispatch(actFetchCategoryProductRequest());
+        fetchAllListCustomerOrders:()=>{
+            dispatch(actFetchListCustomerOrdersRequest());
         },
-        onDeleteProduct: (productId,pageSize,pageIndex,StringFilter) => {
-            dispatch(actDeleteProductRequest(productId,pageSize,pageIndex,StringFilter));
+        onDeleteCustomerOrders: (CustomerOrdersId,pageSize,pageIndex,StringFilter) => {
+            dispatch(actDeleteCustomerOrdersRequest(CustomerOrdersId,pageSize,pageIndex,StringFilter));
         },
-        searchProduct: (pageSize,pageNow,keywork) => {
-            dispatch(searchProductRequest(pageSize,pageNow,keywork))
-        },
-        getTotalData: (stringFilter,condition) => {
-            dispatch(getTotalProduct(stringFilter,condition))
+        searchCustomerOrders: (pageSize,pageNow,keywork) => {
+            dispatch(searchCustomerOrdersRequest(pageSize,pageNow,keywork))
         },
         
 
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProductListPage);
+export default connect(mapStateToProps, mapDispatchToProps)(CustomerOrdersListPage);

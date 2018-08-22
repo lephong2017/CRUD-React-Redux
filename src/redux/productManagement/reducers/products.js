@@ -5,10 +5,11 @@ var productsData = [];
 const products = (state = productsData, action) => {
     var { product, id } = action;
     var index = -1;
+    var arrTemp=[];
     switch (action.type) {
         case Types.FETCH_PRODUCTS:
             var sumTotal = action.totalData;
-            var arrTemp = new Array(sumTotal);
+             arrTemp = new Array(sumTotal);
             arrTemp.fill(0);
             var pageId=action.pageIndex;
             if(pageId===1){
@@ -26,7 +27,7 @@ const products = (state = productsData, action) => {
         case Types.FETCH_PRODUCTS_FILTER:
             var sumData = action.totalData;
             // console.log(sumData+" is total data filter");
-            var arrTemp = new Array(sumData);
+             arrTemp = new Array(sumData);
             arrTemp.fill(0);
             if(action.pageIndex===1){
                 for (let i = 0; i < action.products.length; i++) {

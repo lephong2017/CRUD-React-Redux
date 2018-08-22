@@ -3,12 +3,13 @@ import * as Types from 'redux/categoryManagement/constants/ActionType';
 var arr =[]
 var catesData = [];
 const products = (state = catesData, action) => {
-    var { product, id } = action;
+    var { product } = action;
     var index = -1;
+    var arrTemp=[];
     switch (action.type) {
         case Types.FETCH_CATEGORYS:
             var sumTotal = action.totalData;
-            var arrTemp = new Array(sumTotal);
+             arrTemp = new Array(sumTotal);
             arrTemp.fill(0);
             var pageId=action.pageIndex;
             if(pageId===1){
@@ -26,7 +27,7 @@ const products = (state = catesData, action) => {
         case Types.FETCH_CATEGORYS_FILTER:
             var sumData = action.totalData;
             // console.log(sumData+" is total data filter");
-            var arrTemp = new Array(sumData);
+             arrTemp = new Array(sumData);
             arrTemp.fill(0);
             if(action.pageIndex===1){
                 for (let i = 0; i < action.Category.length; i++) {

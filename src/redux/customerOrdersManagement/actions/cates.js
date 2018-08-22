@@ -1,16 +1,16 @@
 import * as Types from './../constants/ActionType';
 import callApi from '../../../utils/CallAPI/apiCaller';
 
-export const actFetchCategoryCustomerOrdersRequest = () => {
+export const actFetchListCustomerOrdersRequest = () => {
     return (dispatch) => {
-        return callApi('CustomerOrders/getAllCustomerOrders', 'GET', null).then(res => {
-            dispatch(actFetchCategoryCustomerOrders(res.data));
+        return callApi('Customer/getAllCustomer', 'GET', null).then(res => {
+            dispatch(actFetchListCustomerOrders(res.data));
         });
     }
 };
-export const actFetchCategoryCustomerOrders = (category) => {
+export const actFetchListCustomerOrders = (listCustomer) => {
     return {
-        type: Types.FETCH_CATEGORYS,
-        category
+        type: Types.FETCH_CUSTOMER_LIST,
+        listCustomer
     }
 };

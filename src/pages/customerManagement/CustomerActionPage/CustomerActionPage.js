@@ -375,7 +375,7 @@ class CustomerActionPage extends Component {
 
                             </div>
                             <div style={{marginTop:'25px',float:'right'}} className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                <Link to="/cate-list" className="btn btn-danger mr-5">
+                                <Link to="/customer-list" className="btn btn-danger mr-5">
                                     <i className="glyphicon glyphicon-arrow-left"></i> Trở Lại
                                 </Link>
                                 <button type="submit" className="btn btn-primary">
@@ -525,7 +525,7 @@ class CustomerActionPage extends Component {
                         </FormGroup>
                  </div>
                  <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6" style={{float:'right'}}>
-                        <Link to="/cate-list" className="btn btn-danger mr-5">
+                        <Link to="/customer-list" className="btn btn-danger mr-5">
                             <i className="glyphicon glyphicon-arrow-left"></i> Trở Lại
                         </Link>
                         <button type="submit" className="btn btn-primary">

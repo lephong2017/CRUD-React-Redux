@@ -2,24 +2,35 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import swal from 'sweetalert'; 
 import { connect } from 'react-redux';
-import { actAddProductRequest, actUpdateProductRequest, actGetProductRequest } from 'redux/productManagement/actions/index';
-import {FormGroup,ControlLabel,FormControl} from 'react-bootstrap';
-import {actFetchCategoryProductRequest} from 'redux/productManagement/actions/cates';
-class ProductActionPage extends Component {
+import { actAddCustomerOrdersRequest, actUpdateCustomerOrdersRequest, actGetCustomerOrdersRequest } from 'redux/customerOrdersManagement/actions/index';
+import {FormGroup,ControlLabel,FormControl,Form} from 'react-bootstrap';
+import {actFetchListCustomerOrdersRequest} from 'redux/customerOrdersManagement/actions/cates';
+class CustomerOrdersActionPage extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            id: '',
-            txtName: '',
-            txtCategory: '0323EQ',
-            txtDetail: '',
-            addAction:false,
-            validationStateID:null,
-            validationStateCate:null,
-            validationStateName:null,
-            validationStateDetail:null,
             pagination:[],
+            addAction:false,
+
+            orderId: '',
+            customerId: '',
+            orderStatusCode: '',
+            shippingMethodCode: '',
+            oderPlaceDatatime:'',
+            orderDeliveDatatime:'',
+            orderShoppingCharges:'',
+            otherOrtherDetails:'',
+
+            validationOrderId:null,
+            validationCustomerID:null,
+            validationStatusCode:null,
+            validationShipCode:null,
+            validationPlaceDataTime:null,
+            validationDeliveDataTime:null,
+            validationShopCharge:null,
+            validationDetail:null,
+
         };
     }
 
@@ -29,17 +40,21 @@ class ProductActionPage extends Component {
             var id = match.params.id;
             var pagination = match.params.pagination;
             this.setState({pagination:pagination.split(",")},()=>{console.log(this.state.pagination)});
-            this.props.onEditProduct(id);
+            this.props.onEditCustomerOrders(id);
         } else{
             this.setState({
                 addAction:true,
-                id: '',
-                txtName: '',
-                txtCategory: '0323EQ',
-                txtDetail: '',
+                orderId: '',
+                customerId: '',
+                orderStatusCode: '',
+                shippingMethodCode: '',
+                oderPlaceDatatime:'',
+                orderDeliveDatatime:'',
+                orderShoppingCharges:'',
+                otherOrtherDetails:'',
             });
         }
-        this.props.fetchAllCategoryProduct();
+        this.props.fetchAllListCustomerOrders();
         
     }
 
@@ -48,16 +63,36 @@ class ProductActionPage extends Component {
             if(nextProps && nextProps.itemEditing){
                 var {itemEditing} = nextProps;
                 this.setState({
-                    id : itemEditing.productId,
-                    txtCategory : itemEditing.productCategoryCode,
-                    txtName : itemEditing.productName,
-                    txtDetail : itemEditing.otherProductDetails,
+                    orderId: itemEditing.orderId,
+                    customerId: itemEditing.customerId,
+                    orderStatusCode: itemEditing.orderStatusCode,
+                    shippingMethodCode: itemEditing.shippingMethodCode,
+                    oderPlaceDatatime:itemEditing.oderPlaceDatatime,
+                    orderDeliveDatatime:itemEditing.orderDeliveDatatime,
+                    orderShoppingCharges:itemEditing.orderShoppingCharges,
+                    otherOrtherDetails:itemEditing.otherOrtherDetails,
                 })
             }
         }
     }
 
-
+    validateForm =()=>{
+        var isValid = true;
+        var dateSet = this.state.oderPlaceDatatime;
+        var dateDelive = this.state.orderDeliveDatatime;
+        var patternEdit= (/^([0-9]{4})-([0-9]{2})-([0-9]{2})T(([1]{1}[0,1,2]{1})|([0]{1}[0-9]{1})):([0-5]{1}[0-9]{1}):([0-5]{1}[0-9]{1})$/);
+        var patternAdd= (/^([0-9]{4})-([0-9]{2})-([0-9]{2})T(([1]{1}[0,1,2]{1})|([0]{1}[0-9]{1})):([0-5]{1}[0-9]{1})$/);
+        var pattern =(this.state.addAction)?patternAdd:patternEdit;
+        if (dateSet === null || dateSet === "" || !pattern.test(dateSet)) {
+            this.setState({validationPlaceDataTime:'error'});
+            isValid=false;
+        }
+        if (dateDelive === null || dateDelive === "" || !pattern.test(dateDelive)) {
+            this.setState({validationDeliveDataTime:'error'});
+            isValid=false;
+        }
+        return isValid;
+    }
     onChange = (e) => {
         var target = e.target;
         var name = target.name;
@@ -65,168 +100,185 @@ class ProductActionPage extends Component {
         this.setState({
             [name]: value
         });
-        if(name+''==="txtName") this.setState({validationStateName:"success"});
-        if(name+''==="txtDetail") this.setState({validationStateDetail:"success"});
-        if(name+''==="id") this.setState({validationStateID:"success"});
-        if(name+''==="txtCategory") this.setState({validationStateCate:"success"});
+        if(name+''==="orderId") this.setState({validationOrderId:"success"});
+        if(name+''==="customerId") this.setState({validationCustomerID:"success"});
+        if(name+''==="orderStatusCode") this.setState({validationStatusCode:"success"});
+        if(name+''==="shippingMethodCode") this.setState({validationShipCode:"success"});
+        if(name+''==="oderPlaceDatatime") this.setState({validationPlaceDataTime:"success"});
+        if(name+''==="orderDeliveDatatime") this.setState({validationDeliveDataTime:"success"});
+        if(name+''==="orderShoppingCharges") this.setState({validationShopCharge:"success"});
+        if(name+''==="otherOrtherDetails") this.setState({validationDetail:"success"});
     }
 
     onSubmit = (e) => {
         e.preventDefault();
         if (this.state.addAction===false) {
-            var { id, txtName, txtCategory, txtDetail } = this.state;
-            console.log("update act: id:"+id +" name:"+ txtName +" cate:"+ txtCategory+" detail:"+txtDetail);
-            var product = {
-                productId: id,
-                productCategoryCode: txtCategory,
-                productName: txtName,
-                otherProductDetails: txtDetail
+            var { orderId,customerId, orderStatusCode,shippingMethodCode,oderPlaceDatatime,
+                orderDeliveDatatime,orderShoppingCharges,otherOrtherDetails  } = this.state;
+            console.log("update act: id:"+orderId +" Customer name:"+ customerId +" status:"+ orderStatusCode);
+            var orderObj = {
+                orderId: orderId,
+                customerId: customerId,
+                orderStatusCode: orderStatusCode,
+                shippingMethodCode: shippingMethodCode,
+                oderPlaceDatatime:oderPlaceDatatime,
+                orderDeliveDatatime:orderDeliveDatatime,
+                orderShoppingCharges:orderShoppingCharges,
+                otherOrtherDetails:otherOrtherDetails,
             };
-           
-            if(product.productCategoryCode===undefined||product.productCategoryCode===''||
-                product.productName===undefined||product.otherProductDetails===''||
-                product.otherProductDetails===undefined||product.productName===''){
-                if(product.productCategoryCode===''){
-                    this.setState({validationStateCate:'error'});
+           if(this.validateForm()){
+            if(orderObj.orderId===undefined||orderObj.orderId===''||
+                orderObj.customerId===undefined||orderObj.customerId===''){
+                if(orderObj.orderId===''){
+                    this.setState({validationOrderId:'error'});
                 } 
-                if(product.otherProductDetails===''){
-                    this.setState({validationStateDetail:'error'});
+                if(orderObj.customerId===''){
+                    this.setState({validationCustomerID:'error'});
                 } 
-                if(product.productName==='') {
-                    this.setState({validationStateName:'error'});
-                }
-                swal("Lỗi!", "Bạn vừa bỏ trống một số trường quan trọng!", "success");
+                
+                swal("Lỗi!", "Bạn vừa bỏ trống một số trường quan trọng!", "error");
                 e.preventDefault();
             }else{
                 swal("Xong!", "Bạn đã sửa thành công!", "success");
                 var pageIndex=this.state.pagination[0];
                 var pageSize = this.state.pagination[1];
                 var iSearch = this.state.pagination[2];
-                var {saveCateCode} = this.props;
-                if(saveCateCode==='all-cate') iSearch='ALL';
-                if(saveCateCode!=='null') iSearch=saveCateCode;
-                this.props.onUpdateProduct(product,pageIndex,pageSize,iSearch);
+                var {saveCustomerID} = this.props;
+                if(saveCustomerID==='all-cate') iSearch='ALL';
+                if(saveCustomerID!=='null') iSearch=saveCustomerID;
+                this.props.onUpdateCustomerOrders(orderObj,pageIndex,pageSize,iSearch);
                 this.setState({
-                    validationStateID:null,
-                    validationStateCate:null,
-                    validationStateName:null,
-                    validationStateDetail:null,
-                    id:'', 
-                    txtName:'',
-                    txtCategory:'0323EQ',
-                    txtDetail:''
+                    orderId: '',
+                    customerId: '',
+                    orderStatusCode: '',
+                    shippingMethodCode: '',
+                    oderPlaceDatatime:'',
+                    orderDeliveDatatime:'',
+                    orderShoppingCharges:'',
+                    otherOrtherDetails:'',
+        
+                    validationOrderId:null,
+                    validationCustomerID:null,
+                    validationStatusCode:null,
+                    validationShipCode:null,
+                    validationPlaceDataTime:null,
+                    validationDeliveDataTime:null,
+                    validationShopCharge:null,
+                    validationDetail:null,
                 });
                 this.props.history.goBack();
             }
+           }else{
+            swal("Lỗi!", "Bạn nhập sai định dạng ngày!", "error");
+            e.preventDefault();
+           }
+           
         } else {
-            let { id, txtName, txtCategory, txtDetail } = this.state;
-            console.log("add act: id:"+id +" name:"+ txtName +" cate:"+ txtCategory+" detail:"+txtDetail);
-            let product = {
-                productId: id,
-                productCategoryCode: txtCategory,
-                productName: txtName,
-                otherProductDetails: txtDetail
+            let { orderId,customerId, orderStatusCode,shippingMethodCode,oderPlaceDatatime,
+                orderDeliveDatatime,orderShoppingCharges,otherOrtherDetails  } = this.state;
+                console.log("add act: id:"+orderId +" Customer name:"+ customerId +" status:"+ orderStatusCode);
+            let orderObj = {
+                orderId: orderId,
+                customerId: customerId,
+                orderStatusCode: orderStatusCode,
+                shippingMethodCode: shippingMethodCode,
+                oderPlaceDatatime:oderPlaceDatatime,
+                orderDeliveDatatime:orderDeliveDatatime,
+                orderShoppingCharges:orderShoppingCharges,
+                otherOrtherDetails:otherOrtherDetails,
             };
-            if(product.productId===undefined||product.productId===''||
-                product.productCategoryCode===undefined||product.productCategoryCode===''||
-                product.productName===undefined||product.otherProductDetails===''||
-                product.otherProductDetails===undefined||product.productName===''){
-                if(product.productId===undefined||product.productId===''){
-                    this.setState({validationStateID:'error'});
+           if(this.validateForm()){
+            if(orderObj.orderId===undefined||orderObj.orderId===''||
+                orderObj.customerId===undefined||orderObj.customerId===''||
+                orderObj.orderDeliveDatatime===undefined||orderObj.orderDeliveDatatime===''||
+                orderObj.oderPlaceDatatime===undefined||orderObj.oderPlaceDatatime===''){
+                if(orderObj.orderId===undefined||orderObj.orderId===''){
+                    this.setState({validationOrderId:'error'});
                 } 
-                if(product.productCategoryCode===undefined||product.productCategoryCode===''){
-                    this.setState({validationStateCate:'error'});
+                if(orderObj.customerId===undefined||orderObj.customerId===''){
+                    this.setState({validationCustomerID:'error'});
                 } 
-                if(product.otherProductDetails===undefined||product.otherProductDetails===''){
-                    this.setState({validationStateDetail:'error'});
+                if(orderObj.orderDeliveDatatime===undefined||orderObj.orderDeliveDatatime===''){
+                    this.setState({validationDeliveDataTime:'error'});
                 } 
-                if(product.productName===undefined||product.productName==='') {
-                    this.setState({validationStateName:'error'});
+                if(orderObj.oderPlaceDatatime===undefined||orderObj.oderPlaceDatatime==='') {
+                    this.setState({validationPlaceDataTime:'error'});
                 }
 
-                swal("Lỗi!", "Bạn vừa bỏ trống một số trường quan trọng!", "success");
+                swal("Lỗi!", "Bạn vừa bỏ trống một số trường quan trọng!", "error");
                 e.preventDefault();
             }else{
                 swal("Xong!", "Bạn vừa thêm thành công!", "success");
-                this.props.onAddProduct(product);
+                this.props.onAddCustomerOrders(orderObj);
                 this.setState({
-                    validationStateID:null,
-                    validationStateCate:null,
-                    validationStateName:null,
-                    validationStateDetail:null,
-                    id:'', 
-                    txtName:'',
-                    txtCategory:'0323EQ',
-                    txtDetail:''
+                    orderId: '',
+                    customerId: '',
+                    orderStatusCode: '',
+                    shippingMethodCode: '',
+                    oderPlaceDatatime:'',
+                    orderDeliveDatatime:'',
+                    orderShoppingCharges:'',
+                    otherOrtherDetails:'',
+        
+                    validationOrderId:null,
+                    validationCustomerID:null,
+                    validationStatusCode:null,
+                    validationShipCode:null,
+                    validationPlaceDataTime:null,
+                    validationDeliveDataTime:null,
+                    validationShopCharge:null,
+                    validationDetail:null,
                 });
                 this.props.history.goBack();
             }
+           }else{
+            swal("Lỗi!", "Bạn nhập sai định dạng ngày!", "error");
+            e.preventDefault();
+           }
         }
     }
 
    
     render() {
-        var { txtName, txtCategory, txtDetail } = this.state;
-        var {categorys} =this.props;
-        if(txtName===null || txtName===undefined){
-            txtName ="";
-        }
-        if(txtCategory===null || txtCategory===undefined){
-            txtCategory ="";
-        }
-        if(txtDetail===null || txtDetail===undefined ){
-            txtDetail ="";
-        }
+        var { orderId,customerId, orderStatusCode,shippingMethodCode,oderPlaceDatatime,
+            orderDeliveDatatime,orderShoppingCharges,otherOrtherDetails  } = this.state;
+        var {listCustomer} =this.props;
         if(this.state.addAction){
             return (
                 <div className="container">
                     <div className="row">
-                        <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                            <form onSubmit={this.onSubmit}>
+                        <Form   onSubmit={this.onSubmit}>
+                            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                                 <FormGroup
                                     controlId="formBasicText"
-                                    validationState={this.state.validationStateID}
-                                >
+                                    validationState={this.state.validationOrderId}
+                                    >
                                     <div className="form-group">
-                                        <ControlLabel>Mã sản phẩm: </ControlLabel>
+                                        <ControlLabel>Mã đơn hàng: </ControlLabel>
                                         <FormControl
+                                            value={orderId}
                                             type="text"
                                             placeholder="Enter text"
                                             onChange={this.onChange}
-                                            name="id"
+                                            name="orderId"
                                         />
                                         <FormControl.Feedback />
                                     </div>
                                 </FormGroup>
                                 <FormGroup
                                     controlId="formBasicText"
-                                    validationState={this.state.validationStateName}
-                                >
+                                    validationState={this.state.validationCustomerID}
+                                    >
                                     <div className="form-group">
-                                        <ControlLabel>Tên sản phẩm: </ControlLabel>
-                                        <FormControl
-                                            type="text"
-                                            placeholder="Enter text"
-                                            onChange={this.onChange}
-                                            name="txtName"
-                                        />
-                                        <FormControl.Feedback />
-                                    </div>
-                                </FormGroup>
-                                <FormGroup
-                                    controlId="formBasicText"
-                                    validationState={this.state.validationStateCate}
-                                >
-                                    <div className="form-group">
-                                        <ControlLabel>Loại sản phẩm: </ControlLabel>
+                                        <ControlLabel>Tên khách hàng: </ControlLabel>
                                         <FormControl 
-                                                componentClass="select" name="txtCategory"
+                                                componentClass="select" name="customerId"
                                                 placeholder="Select" onChange={this.onChange}>
                                             {
-                                                categorys.map(function(obj,ind){
+                                                listCustomer.map(function(obj,ind){
                                                     return(
-                                                        <option key={ind} value={obj.productCategoryCode}>
-                                                            {obj.productCategoryDescription}
+                                                        <option key={ind} value={obj.customerId}>
+                                                            {obj.customerName}
                                                         </option>
                                                     );
                                                 })
@@ -237,27 +289,114 @@ class ProductActionPage extends Component {
                                 </FormGroup>
                                 <FormGroup
                                     controlId="formBasicText"
-                                    validationState={this.state.validationStateDetail}
+                                    validationState={this.state.validationStatusCode}
                                 >
                                     <div className="form-group">
-                                        <ControlLabel>Chi tiết: </ControlLabel>
+                                        <ControlLabel>Trạng thái đơn hàng: </ControlLabel>
                                         <FormControl
+                                            value={orderStatusCode}
                                             type="text"
                                             placeholder="Enter text"
                                             onChange={this.onChange}
-                                            name="txtDetail"
+                                            name="orderStatusCode"
                                         />
                                         <FormControl.Feedback />
                                     </div>
                                 </FormGroup>
-                                <Link to="/product-list" className="btn btn-danger mr-5">
-                                    <i className="glyphicon glyphicon-arrow-left"></i> Trở Lại
-                                </Link>
-                                <button type="submit" className="btn btn-primary">
-                                    <i className="glyphicon glyphicon-save"></i> Lưu Lại
-                                </button>
-                            </form>
-                        </div>
+                                <FormGroup
+                                    controlId="formBasicText"
+                                    validationState={this.state.validationShipCode}
+                                >
+                                    <div className="form-group">
+                                        <ControlLabel>Mã phương thức vận chuyển: </ControlLabel>
+                                        <FormControl
+                                            value={shippingMethodCode}
+                                            type="text"
+                                            placeholder="Enter text"
+                                            onChange={this.onChange}
+                                            name="shippingMethodCode"
+                                        />
+                                        <FormControl.Feedback />
+                                    </div>
+                                </FormGroup>
+                                <FormGroup
+                                    controlId="formBasicText"
+                                    validationState={this.state.validationPlaceDataTime}
+                                >
+                                    <div className="form-group">
+                                        <ControlLabel>Ngày đặt: </ControlLabel>
+                                        <input
+                                            className="form-control"
+                                            value={oderPlaceDatatime}
+                                            type="datetime-local"
+                                            placeholder="Enter text"
+                                            onChange={this.onChange}
+                                            name="oderPlaceDatatime"
+                                        />
+                                        <FormControl.Feedback />
+                                    </div>
+                                </FormGroup>
+                            </div>
+                            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                <FormGroup
+                                    controlId="formBasicText"
+                                    validationState={this.state.validationDeliveDataTime}
+                                >
+                                    <div className="form-group">
+                                        <ControlLabel>Ngày chuyển: </ControlLabel>
+                                        <input
+                                            className="form-control"
+                                            value={orderDeliveDatatime}
+                                            type="datetime-local"
+                                            placeholder="Enter text"
+                                            onChange={this.onChange}
+                                            name="orderDeliveDatatime"
+                                        />
+                                        <FormControl.Feedback />
+                                    </div>
+                                </FormGroup>
+                                <FormGroup
+                                    controlId="formBasicText"
+                                    validationState={this.state.validationShopCharge}
+                                >
+                                    <div className="form-group">
+                                        <ControlLabel>Shop Charge: </ControlLabel>
+                                        <FormControl
+                                            value={orderShoppingCharges}
+                                            type="text"
+                                            placeholder="Enter text"
+                                            onChange={this.onChange}
+                                            name="orderShoppingCharges"
+                                        />
+                                        <FormControl.Feedback />
+                                    </div>
+                                </FormGroup>
+                                <FormGroup
+                                    controlId="formBasicText"
+                                    validationState={this.state.validationDetail}
+                                >
+                                    <div className="form-group">
+                                        <ControlLabel>Chi tiết đơn hàng: </ControlLabel>
+                                        <FormControl
+                                            value={otherOrtherDetails}
+                                            type="text"
+                                            placeholder="Enter text"
+                                            onChange={this.onChange}
+                                            name="otherOrtherDetails"
+                                        />
+                                        <FormControl.Feedback />
+                                    </div>
+                                </FormGroup>
+                            </div>
+                            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6" style={{float:'right'}}>
+                                    <Link to="/orders-list" className="btn btn-danger mr-5">
+                                        <i className="glyphicon glyphicon-arrow-left"></i> Trở Lại
+                                    </Link>
+                                    <button type="submit" className="btn btn-primary">
+                                        <i className="glyphicon glyphicon-save"></i> Lưu Lại
+                                    </button>
+                            </div>     
+                        </Form>
                     </div>
                 </div>
             );
@@ -265,76 +404,143 @@ class ProductActionPage extends Component {
             return (
             <div className="container">
                 <div className="row">
-                    <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                     <form onSubmit={this.onSubmit}>
-                               
+                    <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                         <FormGroup
                             controlId="formBasicText"
-                            validationState={this.state.validationStateName}
-                        >
+                            validationState={this.state.validationCustomerID}
+                            >
                             <div className="form-group">
-                                <ControlLabel>Tên sản phẩm: </ControlLabel>
+                                <ControlLabel>Tên khách hàng: </ControlLabel>
                                 <FormControl
-                                    value={txtName}
-                                    type="text"
-                                    placeholder="Enter text"
-                                    onChange={this.onChange}
-                                    name="txtName"
-                                />
-                                <FormControl.Feedback />
-                            </div>
-                        </FormGroup>
-                        <FormGroup
-                            controlId="formBasicText"
-                            validationState={this.state.validationStateCate}
-                        >
-                            <div className="form-group">
-                                <ControlLabel>Loại sản phẩm: </ControlLabel>
-                                <FormControl 
-                                        componentClass="select" name="txtCategory"
-                                        placeholder="Select" onChange={this.onChange}>
-                                        <option key={this.state.id} value={txtCategory} selected>
-                                            {txtCategory}
-                                        </option>
+                                    componentClass="select" name="customerId"
+                                    placeholder="Select" onChange={this.onChange}>
+                                    <option key={customerId} value={customerId}>
+                                        {customerId}
+                                    </option>
                                     {
-                                        categorys.map(function(obj,ind){
+                                        listCustomer.map(function(obj,ind){
                                             return(
-                                                <option key={ind} value={obj.productCategoryCode}>
-                                                    {obj.productCategoryDescription}
+                                                <option key={ind} value={obj.customerId}>
+                                                    {obj.customerName}
                                                 </option>
                                             );
                                         })
                                     }
-                                </FormControl>
+                                 </FormControl>
                                 <FormControl.Feedback />
                             </div>
                         </FormGroup>
                         <FormGroup
                             controlId="formBasicText"
-                            validationState={this.state.validationStateDetail}
+                            validationState={this.state.validationStatusCode}
                         >
-                            <div className="form-group">
-                                <ControlLabel>Chi tiết: </ControlLabel>
+                                <ControlLabel>Trạng thái đơn hàng: </ControlLabel>
                                 <FormControl
+                                    value={orderStatusCode}
                                     type="text"
-                                    value={txtDetail}
                                     placeholder="Enter text"
                                     onChange={this.onChange}
-                                    name="txtDetail"
+                                    name="orderStatusCode"
+                                />
+                                <FormControl.Feedback />
+                        </FormGroup>
+                        <FormGroup
+                            controlId="formBasicText"
+                            validationState={this.state.validationShipCode}
+                        >
+                            <div className="form-group">
+                                <ControlLabel>Mã phương thức vận chuyển: </ControlLabel>
+                                <FormControl
+                                    value={shippingMethodCode}
+                                    type="text"
+                                    placeholder="Enter text"
+                                    onChange={this.onChange}
+                                    name="shippingMethodCode"
                                 />
                                 <FormControl.Feedback />
                             </div>
                         </FormGroup>
-                        <Link to="/product-list" className="btn btn-danger mr-5">
-                            <i className="glyphicon glyphicon-arrow-left"></i> Trở Lại
-                        </Link>
-                        <button type="submit" className="btn btn-primary">
-                            <i className="glyphicon glyphicon-save"></i> Lưu Lại
-                        </button>
+                        <FormGroup
+                            controlId="formBasicText"
+                            validationState={this.state.validationPlaceDataTime}
+                        >
+                            <div className="form-group">
+                                <ControlLabel>Ngày đặt: </ControlLabel>
+                                <input
+                                    className="form-control"
+                                    value={oderPlaceDatatime}
+                                    type="datetime-local"
+                                    placeholder="Enter text"
+                                    onChange={this.onChange}
+                                    name="oderPlaceDatatime"
+                                />
+                                <FormControl.Feedback />
+                            </div>
+                        </FormGroup>
+                    </div>
+                            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                            <FormGroup
+                                controlId="formBasicText"
+                                validationState={this.state.validationDeliveDataTime}
+                            >
+                                <div className="form-group">
+                                    <ControlLabel>Ngày chuyển: </ControlLabel>
+                                    <input
+                                        className="form-control"
+                                        value={orderDeliveDatatime}
+                                        type="datetime-local"
+                                        placeholder="Enter text"
+                                        onChange={this.onChange}
+                                        name="orderDeliveDatatime"
+                                    />
+                                    <FormControl.Feedback />
+                                </div>
+                            </FormGroup>
+                            <FormGroup
+                                controlId="formBasicText"
+                                validationState={this.state.validationShopCharge}
+                            >
+                                <div className="form-group">
+                                    <ControlLabel>Shop Charge: </ControlLabel>
+                                    <FormControl
+                                        value={orderShoppingCharges}
+                                        type="text"
+                                        placeholder="Enter text"
+                                        onChange={this.onChange}
+                                        name="orderShoppingCharges"
+                                    />
+                                    <FormControl.Feedback />
+                                </div>
+                            </FormGroup>
+                            <FormGroup
+                                controlId="formBasicText"
+                                validationState={this.state.validationDetail}
+                            >
+                                <div className="form-group">
+                                    <ControlLabel>Chi tiết đơn hàng: </ControlLabel>
+                                    <FormControl
+                                        value={otherOrtherDetails}
+                                        type="text"
+                                        placeholder="Enter text"
+                                        onChange={this.onChange}
+                                        name="otherOrtherDetails"
+                                    />
+                                    <FormControl.Feedback />
+                                </div>
+                            </FormGroup>
+                        </div>
+                        <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6" style={{float:'right'}}>
+                                <Link to="/orders-list" className="btn btn-danger mr-5">
+                                    <i className="glyphicon glyphicon-arrow-left"></i> Trở Lại
+                                </Link>
+                                <button type="submit" className="btn btn-primary">
+                                    <i className="glyphicon glyphicon-save"></i> Lưu Lại
+                                </button>
+                        </div>
                     </form>
                  </div>
                 </div>
-            </div>
         );
     }
     }
@@ -342,27 +548,29 @@ class ProductActionPage extends Component {
 
 const mapStateToProps = state => {
     return {
-        itemEditing : state.itemEditing,
-        categorys: state.categorys,
-        saveCateCode:state.saveCateCode,
+        itemEditing : state.itemOrderEditing,
+        listCustomer:state.listCustomer,
+        saveCustomerID:state.saveCustomerID,
+        orders: state.order,
+        isFetching:state.isFetchingOrder
     }
 }
 
 const mapDispatchToProps = (dispatch, props) => {
     return {
-        onAddProduct: (product) => {
-            dispatch(actAddProductRequest(product));
+        onAddCustomerOrders: (CustomerOrders) => {
+            dispatch(actAddCustomerOrdersRequest(CustomerOrders));
         },
-        onUpdateProduct: (product,pageIndex,pageSize,iSearch) => {
-            dispatch(actUpdateProductRequest(product,pageIndex,pageSize,iSearch));
+        onUpdateCustomerOrders: (CustomerOrders,pageIndex,pageSize,iSearch) => {
+            dispatch(actUpdateCustomerOrdersRequest(CustomerOrders,pageIndex,pageSize,iSearch));
         },
-        onEditProduct : (id) => {
-            dispatch(actGetProductRequest(id));
+        onEditCustomerOrders : (id) => {
+            dispatch(actGetCustomerOrdersRequest(id));
         },
-        fetchAllCategoryProduct:()=>{
-            dispatch(actFetchCategoryProductRequest());
+        fetchAllListCustomerOrders:()=>{
+            dispatch(actFetchListCustomerOrdersRequest());
         },
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProductActionPage);
+export default connect(mapStateToProps, mapDispatchToProps)(CustomerOrdersActionPage);

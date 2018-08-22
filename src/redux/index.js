@@ -15,7 +15,11 @@ import customer from './customerManagement/reducers/cus_index';
 import isFetchingCustomer from './customerManagement/reducers/isFetching';
 import itemCustomerEditing from './customerManagement/reducers/itemCustomerEditing';
 
-
+import order from './customerOrdersManagement/reducers/CutomerOrders';
+import isFetchingOrder from './customerOrdersManagement/reducers/isFetching';
+import itemOrderEditing from './customerOrdersManagement/reducers/itemEditing';
+import saveCustomerID from './customerOrdersManagement/reducers/saveCustomerID';
+import listCustomer from './customerOrdersManagement/reducers/listCustomer';
 
 const appReducers = combineReducers({
     products,
@@ -32,6 +36,12 @@ const appReducers = combineReducers({
     customer,
     isFetchingCustomer,
     itemCustomerEditing,
+
+    order,
+    isFetchingOrder,
+    itemOrderEditing,
+    saveCustomerID,
+    listCustomer,
 });
 
 export default appReducers;

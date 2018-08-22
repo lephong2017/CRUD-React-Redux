@@ -2,41 +2,42 @@ import * as Types from 'redux/customerOrdersManagement/constants/ActionType';
 
 var arr =[]
 var customerOrdersData = [];
-const CutomerOrders = (state = customerOrdersData, action) => {
+const CustomerOrders = (state = customerOrdersData, action) => {
     var { customerOrders, id } = action;
     var index = -1;
+    var arrTemp=[];
     switch (action.type) {
         case Types.FETCH_CUSTOMER_ORDERS:
             var sumTotal = action.totalData;
-            var arrTemp = new Array(sumTotal);
+             arrTemp = new Array(sumTotal);
             arrTemp.fill(0);
             var pageId=action.pageIndex;
             if(pageId===1){
-                for (let i = 0; i < action.CutomerOrders.length; i++) {
-                    arrTemp[i]=action.CutomerOrders[i];
+                for (let i = 0; i < action.CustomerOrders.length; i++) {
+                    arrTemp[i]=action.CustomerOrders[i];
                 } 
                 arr=arrTemp; 
                 return arrTemp;
             }
             var pageSize = action.pageSize;
-            for (var i = 0; i < action.CutomerOrders.length; i++) {
-               arr[(pageId-1)*pageSize+i]=action.CutomerOrders[i];
+            for (var i = 0; i < action.CustomerOrders.length; i++) {
+               arr[(pageId-1)*pageSize+i]=action.CustomerOrders[i];
             }
             return arr;
         case Types.FETCH_CUSTOMER_ORDERS_FILTER:
             var sumData = action.totalData;
             // console.log(sumData+" is total data filter");
-            var arrTemp = new Array(sumData);
+             arrTemp = new Array(sumData);
             arrTemp.fill(0);
             if(action.pageIndex===1){
-                for (let i = 0; i < action.CutomerOrders.length; i++) {
-                    arrTemp[i]=action.CutomerOrders[i];
+                for (let i = 0; i < action.CustomerOrders.length; i++) {
+                    arrTemp[i]=action.CustomerOrders[i];
                 }
                 customerOrdersData=arrTemp;
                 return customerOrdersData;
             } 
-            for (let i = 0; i < action.CutomerOrders.length; i++) {
-                customerOrdersData[(action.pageIndex-1)*action.pageSize+i]=action.CutomerOrders[i];
+            for (let i = 0; i < action.CustomerOrders.length; i++) {
+                customerOrdersData[(action.pageIndex-1)*action.pageSize+i]=action.CustomerOrders[i];
                 
             }
             //copy productData vao arrTemp sau do gan lai cho productData
@@ -53,7 +54,7 @@ const CutomerOrders = (state = customerOrdersData, action) => {
         case Types.ADD_CUSTOMER_ORDER:
             arr=[];
             customerOrdersData=[];
-            state.push(customerOrders);
+            state.push(action.CustomerOrders);
             return [...state];
         case Types.UPDATE_CUSTOMER_ORDER:
             arr=[];
@@ -93,7 +94,7 @@ var findIndexCate = (products, id) => {
     });
     return result;
 }
-export default CutomerOrders;
+export default CustomerOrders;
 
 
 

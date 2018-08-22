@@ -18,7 +18,7 @@ export const actFetchCustomerOrdersRequest = (pageSize,pageIndex,StringFilter) =
 
 export const actFetchCustomerOrders = (CustomerOrders,pageIndex,pageSize,totalData) => {
     return {
-        type: Types.FETCH_CustomerOrders,
+        type: Types.FETCH_CUSTOMER_ORDERS,
         CustomerOrders,
         pageIndex,
         pageSize,
@@ -27,7 +27,7 @@ export const actFetchCustomerOrders = (CustomerOrders,pageIndex,pageSize,totalDa
 };
 export const actFetchCustomerOrdersFilter = (CustomerOrders,pageSize,pageIndex,totalData) => {
     return {
-        type: Types.FETCH_CustomerOrders_FILTER,
+        type: Types.FETCH_CUSTOMER_ORDERS_FILTER,
         CustomerOrders,
         pageSize,
         pageIndex,
@@ -59,24 +59,10 @@ export const searchCustomerOrdersRequest = (pageSize,pageNow,keywork) => {
     }
 };
 
-export const getTotalCustomerOrders = (StringFilter,Condition) => {
-    return (dispatch) => {
-        return callApi(`/CustomerOrders/CountCustomerOrdersFilter/${StringFilter}/${Condition}`, 'GET', null).then(res => {
-            dispatch(actGetTotalData(res.data));
-        });
-    }
-};
-
-export const actGetTotalData = (count) => {
-    return {
-        type: Types.TOTAL_CustomerOrders,
-        count
-    }
-};
 
 export const searchCustomerOrders = (CustomerOrders) => {
     return {
-        type: Types.SEARCH_CustomerOrders,
+        type: Types.SEARCH_CUSTOMER_ORDERS,
         CustomerOrders
     }
 };
@@ -95,15 +81,15 @@ export const actAddCustomerOrdersRequest = (CustomerOrders) => {
 
 export const actAddCustomerOrders = (CustomerOrders) => {
     return {
-        type: Types.ADD_CustomerOrders,
+        type: Types.ADD_CUSTOMER_ORDER,
         CustomerOrders
     }
 }
 
 export const actUpdateCustomerOrdersRequest = (CustomerOrders,pageIndex,pageSize,StringFilter) => {
-    var condition = (StringFilter===0||StringFilter==="ALL"||StringFilter==='')?false:true;
+    var condition = (StringFilter==="ALL"||StringFilter==='')?false:true;
     return (dispatch) => {
-        return callApi(`CustomerOrders/editCustomerOrders/id?id=${CustomerOrders.CustomerOrdersId}`, 'PUT', CustomerOrders).then(res => {
+        return callApi(`CustomerOrders/editCustomerOrders/id?id=${CustomerOrders.orderId}`, 'PUT', CustomerOrders).then(res => {
             var total =0;
             callApi(`/CustomerOrders/CountCustomerOrdersFilter/${StringFilter}/${condition}`, 'GET', null).then(res => {
                 total = res.data;
@@ -122,21 +108,23 @@ export const actUpdateCustomerOrdersRequest = (CustomerOrders,pageIndex,pageSize
 
 export const actUpdateCustomerOrders = (CustomerOrders) => {
     return {
-        type: Types.UPDATE_CustomerOrders,
+        type: Types.UPDATE_CUSTOMER_ORDER,
         CustomerOrders
     }
 }
 
 export const actDeleteCustomerOrdersRequest = (id,pageSize,pageIndex,StringFilter) => {
-    var condition = (StringFilter===0||StringFilter==="ALL"||StringFilter==='')?false:true;
+    var condition = (StringFilter==="ALL"||StringFilter==='')?false:true;
     return (dispatch) => {
         return callApi(`CustomerOrders/deleteCustomerOrders?id=${id}`, 'DELETE', null).then(res => {
+            console.log("delete is "+ res.data);
             var total =0;
             callApi(`/CustomerOrders/CountCustomerOrdersFilter/${StringFilter}/${condition}`, 'GET', null).then(res => {
                 total = res.data;
             });
             return callApi(`CustomerOrders/FilterCustomerOrders/${pageSize}/${pageIndex}/${StringFilter}`, 'GET', null).then(res => {
-                if(StringFilter===''||StringFilter===0||StringFilter==="ALL"){
+                if(StringFilter===''||StringFilter==="ALL"){
+                    console.log(res.data);
                     dispatch(actFetchCustomerOrders(res.data,pageIndex,pageSize,total));
                 }else{
                     dispatch(actFetchCustomerOrdersFilter(res.data,pageSize,pageIndex,total));
@@ -150,7 +138,7 @@ export const actDeleteCustomerOrdersRequest = (id,pageSize,pageIndex,StringFilte
 
 export const actDeleteCustomerOrders = (id) => {
     return {
-        type: Types.DELETE_CustomerOrders,
+        type: Types.DELETE_CUSTOMER_ORDER,
         id
     }
 }
@@ -165,18 +153,18 @@ export const actGetCustomerOrdersRequest = (id) => {
 
 export const actGetCustomerOrders = (CustomerOrders) => {
     return {
-        type : Types.EDIT_CustomerOrders,
+        type : Types.EDIT_CUSTOMER_ORDER,
         CustomerOrders
     }
 }
-export const actSaveCateCode = (cateCode) => {
+export const actSaveCateCode = (CustomerOrders) => {
     return {
-        type : Types.SAVE_CATE_CODE,
-        cateCode
+        type : Types.SAVE_CUSTOMER_ORDER_CODE,
+        CustomerOrders
     }
 }
 
-export const actGetCustomerOrdersRequestByCateID = (id,pageIndex,pageSize) => {
+export const actGetCustomerOrdersRequestByCustomerID = (id,pageIndex,pageSize) => {
     return (dispatch) => {
         var total =0;
         callApi(`/CustomerOrders/CountCustomerOrdersFilter/${id}/false`, 'GET', null).then(res => {
@@ -198,7 +186,7 @@ export const actGetCustomerOrdersRequestByCateID = (id,pageIndex,pageSize) => {
 
 export const actGetCustomerOrdersByCateId = (CustomerOrders,id) => {
     return {
-        type : Types.FIND_CustomerOrders_BY_CATEID,
+        type : Types.FIND_CUSTOMER_ORDER_BY_CATEID,
         CustomerOrders,
         id
     }

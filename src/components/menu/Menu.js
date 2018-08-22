@@ -23,7 +23,7 @@ const menus = [
         exact : false
     },
     {
-        name : 'Quản Lý Đơn hàng',
+        name : 'Quản Lý Đơn Hàng',
         to : '/orders-list',
         exact : false
     },

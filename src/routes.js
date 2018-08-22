@@ -7,12 +7,14 @@ import CustomerActionPage from './pages/customerManagement/CustomerActionPage/Cu
 import CustomerListPage from './pages/customerManagement/CustomerListPage/CustomerListPage';
 import OrdersListPage from './pages/customerOrdersManagement/OrdersListPage/OrdersListPage';
 import OrdersActionPage from './pages/customerOrdersManagement/OrdersActionPage/OrdersActionPage';
+
+import HomePage from './pages/homePage/index';
 const routes = [
-    // {
-    //     path: '/',
-    //     exact: true,
-    //     main: () => <HomePage />
-    // },
+    {
+        path: '/',
+        exact: true,
+        main: () => <HomePage />
+    },
     {
         path: '/cate-list',
         exact: false,

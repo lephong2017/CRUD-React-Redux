@@ -31,7 +31,8 @@ class CateListPage extends Component {
         this.props.fetchAllCategory(pageSize,pageIndex,iSearch);
     }
     onChange=e =>{
-        if(e.target.value===''){
+        var val =e.target.value;
+        if(val.trim()===''){
             this.setState({iSearch:"ALL"});
             this.props.fetchAllCategory(this.state.pageSize,this.state.pageIndex,"ALL");
         }else{

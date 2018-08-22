@@ -36,7 +36,8 @@ class ProductListPage extends Component {
         this.props.fetchAllCategoryProduct();
     }
     onChange=e =>{
-        if(e.target.value===''){
+        var val =e.target.value;
+        if(val.trim()===''){
             this.setState({iSearch:"ALL"});
             this.props.fetchAllProducts(this.state.pageSize,this.state.pageIndex,"ALL");
             this.props.fetchAllCategoryProduct();
@@ -71,7 +72,7 @@ class ProductListPage extends Component {
         });
        
     }
-    onDelete = (id) => { 
+    onDeleteProduct = (id) => { 
         var {onDeleteProduct,saveCateCode} = this.props;
         var StringFilter=this.state.iSearch;
         if(saveCateCode==='all-cate'){
