@@ -77,10 +77,9 @@ export const actAddCustomer = (Customer) => {
 
 export const actUpdateCustomerRequest = (Customer,pageIndex,pageSize,StringFilter) => {
     var condition = (StringFilter===0||StringFilter==="ALL"||StringFilter==='')?false:true;
-    console.log(Customer);
-    console.log("================");
     return (dispatch) => {
-        return callApi(`Customer/editCustomer/id?id=${Customer.cateId}`, 'PUT', Customer).then(res => {
+        return callApi(`Customer/editCustomer/id?id=${Customer.customerId}`, 'PUT', Customer).then(res => {
+            console.log("edit is: "+res.data);
             var total =0;
             callApi(`/Customer/CountCustomerFilter/${StringFilter}/${condition}`, 'GET', null).then(res => {
                 total = res.data;
@@ -105,7 +104,6 @@ export const actUpdateCustomer = (Customer) => {
 
 export const actDeleteCustomerRequest = (id,pageSize,pageIndex,StringFilter) => {
     var condition = (StringFilter===0||StringFilter==="ALL"||StringFilter==='')?false:true;
-    console.log('ok delete');
     return (dispatch) => {
         return callApi(`Customer/deleteCustomer?id=${id}`, 'DELETE', null).then(res => {
             var total =0;

@@ -5,7 +5,8 @@ import ProductActionPage from './pages/productManagement/ProductActionPage/Produ
 import CateActionPage from 'pages/categoryManagement/CateActionPage/CateActionPage';
 import CustomerActionPage from './pages/customerManagement/CustomerActionPage/CustomerActionPage';
 import CustomerListPage from './pages/customerManagement/CustomerListPage/CustomerListPage';
-
+import OrdersListPage from './pages/customerOrdersManagement/OrdersListPage/OrdersListPage';
+import OrdersActionPage from './pages/customerOrdersManagement/OrdersActionPage/OrdersActionPage';
 const routes = [
     // {
     //     path: '/',
@@ -26,6 +27,21 @@ const routes = [
         path: '/cate/:id/:pagination/edit',
         exact: false,
         main: ({ match, history }) => <CateActionPage match={match} history={history} />
+    },
+    {
+        path: '/orders-list',
+        exact: false,
+        main: () => <OrdersListPage />
+    },
+    {
+        path: '/orders/add',
+        exact: false, 
+        main: ({ location, history }) => <OrdersActionPage location={location} history={history} />
+    },
+    {
+        path: '/orders/:id/:pagination/edit',
+        exact: false,
+        main: ({ match, history }) => <OrdersActionPage match={match} history={history} />
     },
     {
         path: '/customer-list',

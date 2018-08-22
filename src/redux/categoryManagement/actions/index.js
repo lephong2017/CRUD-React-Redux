@@ -105,7 +105,6 @@ export const actUpdateCategory = (Category) => {
 
 export const actDeleteCategoryRequest = (id,pageSize,pageIndex,StringFilter) => {
     var condition = (StringFilter===0||StringFilter==="ALL"||StringFilter==='')?false:true;
-    console.log('ok delete');
     return (dispatch) => {
         return callApi(`RefProductCategories/deleteRefProductCategories?id=${id}`, 'DELETE', null).then(res => {
             var total =0;

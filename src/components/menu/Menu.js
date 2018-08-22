@@ -22,6 +22,11 @@ const menus = [
         to : '/customer-list',
         exact : false
     },
+    {
+        name : 'Quản Lý Đơn hàng',
+        to : '/orders-list',
+        exact : false
+    },
 ]
 
 const MenuLink = ({ label, to, activeOnlyWhenExact }) => {

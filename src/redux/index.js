@@ -15,6 +15,8 @@ import customer from './customerManagement/reducers/cus_index';
 import isFetchingCustomer from './customerManagement/reducers/isFetching';
 import itemCustomerEditing from './customerManagement/reducers/itemCustomerEditing';
 
+
+
 const appReducers = combineReducers({
     products,
     itemEditing,
