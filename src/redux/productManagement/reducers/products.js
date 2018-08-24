@@ -49,6 +49,8 @@ const products = (state = productsData, action) => {
             }
             productsData.set(action.pageIndex,objPageData);
             return productsData;
+        case Types.GET_ALL_PRODUCT:
+            return [...action.product];
         case Types.FILTER_PRODUCT:
             return [...productsData];
         case Types.ADD_PRODUCT:

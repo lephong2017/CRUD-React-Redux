@@ -49,6 +49,8 @@ const CustomerOrders = (state = customerOrdersData, action) => {
             }
             customerOrdersData.set(action.pageIndex,objPageData);
             return customerOrdersData;
+        case Types.FETCH_ALL_CUSTOMER_ORDERS:
+            return [...action.CustomerOrders];
         case Types.FILTER_CUSTOMER_ORDER:
             return [...customerOrdersData];
         case Types.ADD_CUSTOMER_ORDER:

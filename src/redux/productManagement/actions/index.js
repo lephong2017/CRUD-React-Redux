@@ -1,6 +1,21 @@
 import * as Types from 'redux/productManagement/constants/ActionType';
 import callApi from 'utils/CallAPI/apiCaller';
 
+export const actGetAllProduct = () => {
+    return (dispatch) => {
+        return callApi(`Product/getAllProduct`, 'GET', null).then(res => {
+            if(undefined!==res){
+                dispatch(actFetchAllProduct(res.data));
+            }
+        });
+    } 
+};
+export const actFetchAllProduct = (product) => {
+    return {
+        type: Types.GET_ALL_PRODUCT,
+        product
+    }
+};
 export const actFetchProductsRequest = (pageSize,pageIndex,StringFilter) => {
     var total =0;
     callApi(`/Product/CountProductFilter/${StringFilter}/false`, 'GET', null).then(res => {

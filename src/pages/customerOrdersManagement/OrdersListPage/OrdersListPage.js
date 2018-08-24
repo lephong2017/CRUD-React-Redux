@@ -127,7 +127,7 @@ class CustomerOrdersListPage extends Component {
                                              this.state.pageSize,
                                             ]} 
                                          cateButton="Primary" 
-                                         title="Category" id="1" 
+                                         title="Customer" id="1" 
                                          listCustomer={listCustomer}/>
                                     </div>
                                 </div>

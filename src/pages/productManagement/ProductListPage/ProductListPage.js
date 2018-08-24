@@ -181,6 +181,14 @@ class ProductListPage extends Component {
                                             filterAll: true
                                         },
                                         {
+                                            Header: "Price",
+                                            id: "productPrice",
+                                            accessor: d => d.productPrice,
+                                            filterMethod: (filter, rows) =>
+                                            matchSorter(rows, filter.value, { keys: ["productPrice"] }),
+                                            filterAll: true
+                                        },
+                                        {
                                             Header: "Detail",
                                             id: "otherProductDetails",
                                             accessor: d => d.otherProductDetails,

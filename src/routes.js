@@ -6,7 +6,8 @@ import CateActionPage from 'pages/categoryManagement/CateActionPage/CateActionPa
 import CustomerActionPage from './pages/customerManagement/CustomerActionPage/CustomerActionPage';
 import CustomerListPage from './pages/customerManagement/CustomerListPage/CustomerListPage';
 import OrdersListPage from './pages/customerOrdersManagement/OrdersListPage/OrdersListPage';
-import OrdersActionPage from './pages/customerOrdersManagement/OrdersActionPage/OrdersActionPage';
+import OrdersAddPage from './pages/customerOrdersManagement/OrdersActionPage/AddPage';
+import OrdersEditPage from './pages/customerOrdersManagement/OrdersActionPage/EditPage';
 
 import HomePage from './pages/homePage/index';
 const routes = [
@@ -38,12 +39,12 @@ const routes = [
     {
         path: '/orders/add',
         exact: false, 
-        main: ({ location, history }) => <OrdersActionPage location={location} history={history} />
+        main: ({ location, history }) => <OrdersAddPage location={location} history={history} />
     },
     {
         path: '/orders/:id/:pagination/edit',
         exact: false,
-        main: ({ match, history }) => <OrdersActionPage match={match} history={history} />
+        main: ({ match, history }) => <OrdersEditPage match={match} history={history} />
     },
     {
         path: '/customer-list',

@@ -21,27 +21,19 @@ import itemOrderEditing from './customerOrdersManagement/reducers/itemEditing';
 import saveCustomerID from './customerOrdersManagement/reducers/saveCustomerID';
 import listCustomer from './customerOrdersManagement/reducers/listCustomer';
 
+import isOrderItemEditing from './orderItemManagement/reducers/itemOrderEditing';
+import orderItem from './orderItemManagement/reducers/orderItem';
+
 const appReducers = combineReducers({
-    products,
-    itemEditing,
-    categorys,
-    saveCateCode,
-    totalData,
-    isFetching,
+    products,itemEditing,categorys,saveCateCode,totalData,isFetching,
     
-    categorys_index,
-    isFetchingCategory,
-    itemCateEditing,
+    categorys_index,isFetchingCategory,itemCateEditing,
 
-    customer,
-    isFetchingCustomer,
-    itemCustomerEditing,
+    customer,isFetchingCustomer,itemCustomerEditing,
 
-    order,
-    isFetchingOrder,
-    itemOrderEditing,
-    saveCustomerID,
-    listCustomer,
+    order,isFetchingOrder,itemOrderEditing,saveCustomerID,listCustomer,
+
+    isOrderItemEditing,orderItem
 });
 
 export default appReducers;

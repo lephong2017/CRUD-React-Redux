@@ -6,7 +6,6 @@ export const actFetchCustomerOrdersRequest = (pageSize,pageIndex,StringFilter) =
     callApi(`/CustomerOrders/CountCustomerOrdersFilter/${StringFilter}/false`, 'GET', null).then(res => {
         total = res.data;
     });
-
     return (dispatch) => {
         dispatch(actFetching(true));
         return callApi(`CustomerOrders/FilterCustomerOrders/${pageSize}/${pageIndex}/${StringFilter}`, 'GET', null).then(res => {
@@ -15,7 +14,20 @@ export const actFetchCustomerOrdersRequest = (pageSize,pageIndex,StringFilter) =
         });
     } 
 };
+export const getAllListOrders = () => {
+    return (dispatch) => {
+        return callApi(`CustomerOrders/getAllCustomerOrders`, 'GET', null).then(res => {
+            dispatch(fetchAllListOrder(res.data));
+        });
+    } 
+};
 
+export const fetchAllListOrder = (CustomerOrders) => {
+    return {
+        type: Types.FETCH_ALL_CUSTOMER_ORDERS,
+        CustomerOrders,
+    }
+};
 export const actFetchCustomerOrders = (CustomerOrders,pageIndex,pageSize,totalData) => {
     return {
         type: Types.FETCH_CUSTOMER_ORDERS,

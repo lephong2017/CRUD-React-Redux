@@ -19,7 +19,9 @@ class ProductActionPage extends Component {
             validationStateCate:null,
             validationStateName:null,
             validationStateDetail:null,
+            validationNumber:null,
             pagination:[],
+            number:'',
         };
     }
 
@@ -28,7 +30,7 @@ class ProductActionPage extends Component {
         if (match) { // update
             var id = match.params.id;
             var pagination = match.params.pagination;
-            this.setState({pagination:pagination.split(",")},()=>{console.log(this.state.pagination)});
+            this.setState({pagination:pagination.split(",")});
             this.props.onEditProduct(id);
         } else{
             this.setState({
@@ -37,6 +39,7 @@ class ProductActionPage extends Component {
                 txtName: '',
                 txtCategory: '0323EQ',
                 txtDetail: '',
+                number:'50107',
             });
         }
         this.props.fetchAllCategoryProduct();
@@ -52,6 +55,7 @@ class ProductActionPage extends Component {
                     txtCategory : itemEditing.productCategoryCode,
                     txtName : itemEditing.productName,
                     txtDetail : itemEditing.otherProductDetails,
+                    number:itemEditing.productPrice
                 })
             }
         }
@@ -69,18 +73,22 @@ class ProductActionPage extends Component {
         if(name+''==="txtDetail") this.setState({validationStateDetail:"success"});
         if(name+''==="id") this.setState({validationStateID:"success"});
         if(name+''==="txtCategory") this.setState({validationStateCate:"success"});
+        if(name+''==="number") this.setState({validationNumber:"success"});
     }
-
+    IsNumeric=(n)=> {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
     onSubmit = (e) => {
         e.preventDefault();
         if (this.state.addAction===false) {
-            var { id, txtName, txtCategory, txtDetail } = this.state;
+            var { id, txtName, txtCategory, txtDetail,number } = this.state;
             console.log("update act: id:"+id +" name:"+ txtName +" cate:"+ txtCategory+" detail:"+txtDetail);
             var product = {
                 productId: id,
                 productCategoryCode: txtCategory,
                 productName: txtName,
-                otherProductDetails: txtDetail
+                otherProductDetails: txtDetail,
+                productPrice:number
             };
            
             if(product.productCategoryCode===undefined||product.productCategoryCode===''||
@@ -111,21 +119,24 @@ class ProductActionPage extends Component {
                     validationStateCate:null,
                     validationStateName:null,
                     validationStateDetail:null,
+                    validationNumber:null,
                     id:'', 
                     txtName:'',
                     txtCategory:'0323EQ',
-                    txtDetail:''
+                    txtDetail:'',
+                    number:'50107'
                 });
                 this.props.history.goBack();
             }
         } else {
-            let { id, txtName, txtCategory, txtDetail } = this.state;
+            let { id, txtName, txtCategory, txtDetail,number } = this.state;
             console.log("add act: id:"+id +" name:"+ txtName +" cate:"+ txtCategory+" detail:"+txtDetail);
             let product = {
                 productId: id,
                 productCategoryCode: txtCategory,
                 productName: txtName,
-                otherProductDetails: txtDetail
+                otherProductDetails: txtDetail,
+                productPrice:number
             };
             if(product.productId===undefined||product.productId===''||
                 product.productCategoryCode===undefined||product.productCategoryCode===''||
@@ -143,6 +154,9 @@ class ProductActionPage extends Component {
                 if(product.productName===undefined||product.productName==='') {
                     this.setState({validationStateName:'error'});
                 }
+                if(product.productPrice===undefined||product.productPrice===''||!this.IsNumeric(product.productPrice)){
+                    this.setState({validationNumber:'error'});
+                }
 
                 swal("Lỗi!", "Bạn vừa bỏ trống một số trường quan trọng!", "success");
                 e.preventDefault();
@@ -154,10 +168,12 @@ class ProductActionPage extends Component {
                     validationStateCate:null,
                     validationStateName:null,
                     validationStateDetail:null,
+                    validationNumber:null,
                     id:'', 
                     txtName:'',
                     txtCategory:'0323EQ',
-                    txtDetail:''
+                    txtDetail:'',
+                    number:'50107'
                 });
                 this.props.history.goBack();
             }
@@ -166,7 +182,7 @@ class ProductActionPage extends Component {
 
    
     render() {
-        var { txtName, txtCategory, txtDetail } = this.state;
+        var { txtName, txtCategory, txtDetail,number } = this.state;
         var {categorys} =this.props;
         if(txtName===null || txtName===undefined){
             txtName ="";
@@ -250,6 +266,23 @@ class ProductActionPage extends Component {
                                         <FormControl.Feedback />
                                     </div>
                                 </FormGroup>
+                                <FormGroup
+                                    controlId="formBasicText"
+                                    validationState={this.state.validationNumber}
+                                >
+                                    <div className="form-group">
+                                        <ControlLabel>Giá sản phẩm: </ControlLabel>
+                                        <FormControl
+                                            type="number"
+                                            min="50107"
+                                            max='1000000000'
+                                            placeholder="Enter text"
+                                            onChange={this.onChange}
+                                            name="number"
+                                        />
+                                        <FormControl.Feedback />
+                                    </div>
+                                </FormGroup>
                                 <Link to="/product-list" className="btn btn-danger mr-5">
                                     <i className="glyphicon glyphicon-arrow-left"></i> Trở Lại
                                 </Link>
@@ -275,7 +308,7 @@ class ProductActionPage extends Component {
                             <div className="form-group">
                                 <ControlLabel>Tên sản phẩm: </ControlLabel>
                                 <FormControl
-                                    value={txtName}
+                                    defaultValue={txtName}
                                     type="text"
                                     placeholder="Enter text"
                                     onChange={this.onChange}
@@ -293,7 +326,7 @@ class ProductActionPage extends Component {
                                 <FormControl 
                                         componentClass="select" name="txtCategory"
                                         placeholder="Select" onChange={this.onChange}>
-                                        <option key={this.state.id} value={txtCategory} selected>
+                                        <option key={this.state.id} defaultValue={txtCategory} >
                                             {txtCategory}
                                         </option>
                                     {
@@ -317,10 +350,28 @@ class ProductActionPage extends Component {
                                 <ControlLabel>Chi tiết: </ControlLabel>
                                 <FormControl
                                     type="text"
-                                    value={txtDetail}
+                                    defaultValue={txtDetail}
                                     placeholder="Enter text"
                                     onChange={this.onChange}
                                     name="txtDetail"
+                                />
+                                <FormControl.Feedback />
+                            </div>
+                        </FormGroup>
+                        <FormGroup
+                            controlId="formBasicText"
+                            validationState={this.state.validationNumber}
+                        >
+                            <div className="form-group">
+                                <ControlLabel>Giá cả: </ControlLabel>
+                                <FormControl
+                                    type="number"
+                                    min='50107'
+                                    max='1000000000'
+                                    defaultValue={number}
+                                    placeholder="Enter text"
+                                    onChange={this.onChange}
+                                    name="number"
                                 />
                                 <FormControl.Feedback />
                             </div>
@@ -364,5 +415,5 @@ const mapDispatchToProps = (dispatch, props) => {
         },
     }
 }
-
+ 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductActionPage);
